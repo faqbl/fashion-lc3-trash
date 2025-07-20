@@ -3,3 +3,4 @@
 This program is aimed to change the values of two higher bits and two lower bits of a four bits hexadecimal number,
 e.g. x1234 changes into x3412.
 Update:The simplified Chinese explanatory notes have been translated into the English ver.(the simplified Chinese ver. is kept).
+Update2:bro go to see the CS2 FISSURE final,upload code tomorrow or farther futureXD.2025-07-20 20:47:11
