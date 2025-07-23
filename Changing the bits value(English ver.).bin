@@ -1,0 +1,51 @@
+0011 0000 0000 0000;	.ORIG x3000
+1010 000 000011101;	R0 fetch the address x3500 stored in DATA
+0010 001 000011110;	R1 fetch the value x0007 stored in TIMES
+0010 010 000011110;	R2 fetch the instruction xFF00 stored in CODE
+1001 010 010 111111;	R2 negate(turn into x00FF)
+0101 011 011 1 00000;	AND R3,R3,#0,R3 clear
+0001 011 000 000 011;	ADD R3,R0,R3,R3=R0
+0101 011 011 000 010;	AND R3,R3,R2,R3%=100
+;ADD1
+0001 011 011 000 011;	ADD R3,R3,R3,R3*=2
+0001 001 001 1 00000;	ADD R1,R1,#0,NO OPERATION(PC point to R1)
+0000 010 000000010;	if R1=0,jump to NEXT
+0001 001 001 1 11111;	ADD R1,R1,#-1,R1--
+0000 111 111111011;	unconditionally jump to ADD1
+;NEXT
+0101 100 100 1 00000;	R4clear
+0001 100 000 000 100;	R4=R0
+1001 010 010 111111;	R2 negate(turn back to xFF00)
+0101 100 100 000 010;	AND R4,R4,R2,R4 divisible by 100
+0000 010 000001010;	if R4=0,jump to ADDUP2
+0010 101 000001111;	R5 fetch the instruction xFF00 stored in CODE
+1001 101 101 111111;	R5 negate(turn into x00FF)
+;ADD2
+0001 100 101 000 100;	ADD R4,R5,R4,R4+=R5
+0001 110 100 000 101;	ADD R6,R4,R5
+0101 110 010 000 110;	R6 divisible by 100
+0000 010 000000010;	if R6=0,jump toADDUP1
+0101 110 110 000 110;	R6clear
+0000 111 111111010;	unconditionally jump to ADD2
+;ADDUP1
+0010 111 000001000;	R7 fetch the value x0100 stored in SUPPLY
+0001 100 100 000 111;	R4+=R7
+;ADDUP2
+0001 100 011 000 100;	R4+=R3
+1011 100 000000010;	storet the content of R4 in RESULT
+1111 0000 00100101;	TRAP x25,HALT
+0011 0101 0000 0000;	DATA 	.FILL x3500
+0011 0101 0000 0001;	RESULT	.FILL x3501
+0000 0000 0000 0111;	TIMES	.FILL x0007
+1111 1111 0000 0000;	CODE	.FILL xFF00
+0000 0001 0000 0000;	SUPPLY	.FILL x0100
+;General idea:to change the high two bits and low two bits of the 4-bit hexadecimal number,that is to change the high eight bits and low eight bits of the corresponding 16-bit binary number.
+;As for the higher bits,multiplication is needed;as for the lower bits,division is needed
+;The multiplication for the lower bits is to ¡Á2 for eight times(¡Á256)to moveleft(8 bits for binary,2 bits for hexadecimal)
+;Caz there's no ready made division in LC-33,and we cannot apply subtraction(similar to apply addition as multiplication)
+;So here we apply the way that constantly add x00FF
+;We can find that once we add the 4-bit hexadecimal number(without low two bits) and x00FF to a certain degree
+;The degree is that the sum is over x10000(cause overflow,display the next loop) and at this time the low two bits of the sum is just right the high two bits of the original number(use a random number to test if you're skeptical)
+;Thus we judge(by minus xFF00 and then restore) before(when the high two bits of the sum is FF)the overflow,if overflow approaching,we add one more x00FF to get the final result
+;*handle exceptional case:if the high two bits of the original number has already been FF,get the value directly(so the program judge first and add x00FF later);
+;*another exceptional case:if the high two bits of the original number is 00,while adding x00FF,the high two bits of the sum being FF will occur twice,so we get it directly as well
