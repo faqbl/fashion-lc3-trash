@@ -4,3 +4,4 @@ This program is aimed to change the values of two higher bits and two lower bits
 e.g. x1234 changes into x3412.
 Update:The simplified Chinese explanatory notes have been translated into the English ver.(the simplified Chinese ver. is kept).
 Update2:bro go to see the CS2 FISSURE final,upload code tomorrow or farther futureXD.2025-07-20 20:47:11
+Update3:Translating is time consuming.Now upload accomplished.2025-07-23 16:31:31
